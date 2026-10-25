@@ -1,7 +1,8 @@
 import time
-from utils import clear_screen
+from utils import clear_screen, load_json
 from auth import registrasi_user, login_user
 from kamera import tampilkan_kamera, tambah_kamera, ubah_kamera, hapus_kamera
+from transaksi import top_up_saldo, sewa_kamera, pengembalian_kamera, riwayat_user, riwayat_admin
 
 def menu_admin(user_aktif):
     while True:
@@ -13,9 +14,10 @@ def menu_admin(user_aktif):
         print("2. Tambah Data Kamera Baru")
         print("3. Ubah Data Kamera")
         print("4. Hapus Data Kamera")
-        print("5. Logout")
+        print("5. Laporan Transaksi")
+        print("6. Logout")
         print("------------------------------------------")
-        pilihan = input("Pilih Menu (1-5) > ")
+        pilihan = input("Pilih Menu (1-6) > ").strip()
         
         if pilihan == '1':
             clear_screen()
@@ -31,6 +33,8 @@ def menu_admin(user_aktif):
         elif pilihan == '4':
             hapus_kamera()
         elif pilihan == '5':
+            riwayat_admin()
+        elif pilihan == '6':
             print("\n[✓] Logout berhasil...")
             time.sleep(1)
             break
@@ -40,15 +44,26 @@ def menu_admin(user_aktif):
 
 def menu_user(user_aktif):
     while True:
+        # Sinkronisasi status data user terbaru dari users.json
+        users = load_json('data/users.json')
+        for u in users:
+            if u['username'].lower() == user_aktif['username'].lower():
+                user_aktif.update(u)
+                break
+
         clear_screen()
         print("------------------------------------------")
         print(f"    MENU USER RENTAL KAMERA ({user_aktif['username']})")
         print(f"    Saldo E-Money: Rp {user_aktif.get('saldo', 0):,}")
         print("------------------------------------------")
         print("1. Lihat Katalog Kamera Tersedia")
-        print("2. Logout")
+        print("2. Sewa Kamera & Alat")
+        print("3. Pengembalian Kamera")
+        print("4. Top Up Saldo E-Money")
+        print("5. Riwayat Transaksi & Cetak Invoice")
+        print("6. Logout")
         print("------------------------------------------")
-        pilihan = input("Pilih Menu (1-2) > ")
+        pilihan = input("Pilih Menu (1-6) > ").strip()
         
         if pilihan == '1':
             clear_screen()
@@ -58,6 +73,14 @@ def menu_user(user_aktif):
             tampilkan_kamera()
             input("\nTekan Enter untuk kembali ke menu...")
         elif pilihan == '2':
+            sewa_kamera(user_aktif)
+        elif pilihan == '3':
+            pengembalian_kamera(user_aktif)
+        elif pilihan == '4':
+            top_up_saldo(user_aktif)
+        elif pilihan == '5':
+            riwayat_user(user_aktif)
+        elif pilihan == '6':
             print("\n[✓] Logout berhasil...")
             time.sleep(1)
             break
@@ -76,7 +99,7 @@ def main():
         print("2. Registrasi User Baru")
         print("3. Keluar Aplikasi")
         print("------------------------------------------")
-        pilihan = input("Pilih Menu (1-3) > ")
+        pilihan = input("Pilih Menu (1-3) > ").strip()
         
         if pilihan == '1':
             user = login_user()
