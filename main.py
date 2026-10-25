@@ -44,7 +44,6 @@ def menu_admin(user_aktif):
 
 def menu_user(user_aktif):
     while True:
-        # Sinkronisasi status data user terbaru dari users.json
         users = load_json('data/users.json')
         for u in users:
             if u['username'].lower() == user_aktif['username'].lower():
