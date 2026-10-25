@@ -9,6 +9,8 @@ def clear_screen():
 
 def load_json(nama_file):
     try:
+        if not os.path.exists(nama_file):
+            return []
         with open(nama_file, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
@@ -21,6 +23,9 @@ def load_json(nama_file):
 
 def save_json(nama_file, data):
     try:
+        dir_name = os.path.dirname(nama_file)
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
         with open(nama_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
         return True
