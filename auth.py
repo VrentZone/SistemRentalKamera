@@ -1,34 +1,72 @@
-import os
-import json
+import time
+import pwinput
+from utils import clear_screen, load_json, save_json
 
-def clear_screen():
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
+FILE_USERS = 'data/users.json'
 
-def load_json(nama_file):
-    try:
-        if not os.path.exists(nama_file):
-            return []
-        with open(nama_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-    except json.JSONDecodeError:
-        return []
-    except Exception as e:
-        print(f"Terjadi kesalahan saat membaca file {nama_file}: {e}")
-        return []
-
-def save_json(nama_file, data):
-    try:
-        dir_name = os.path.dirname(nama_file)
-        if dir_name:
-            os.makedirs(dir_name, exist_ok=True)
-        with open(nama_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4)
-        return True
-    except Exception as e:
-        print(f"Terjadi kesalahan saat menyimpan file {nama_file}: {e}")
+def registrasi_user():
+    clear_screen()
+    print("----------------------------------------")
+    print("         REGISTRASI AKUN USER           ")
+    print("----------------------------------------")
+    users = load_json(FILE_USERS)
+    
+    username = input("Masukkan Username Baru (min 4 karakter): ")
+    if len(username) < 4:
+        print("\n[!] Username terlalu pendek! Minimal 4 karakter.")
+        time.sleep(1.5)
         return False
+
+    for user in users:
+        if user['username'].lower() == username.lower():
+            print("\n[!] Username sudah terdaftar! Gunakan username lain.")
+            time.sleep(1.5)
+            return False
+
+    password = pwinput.pwinput("Masukkan Password (min 4 karakter): ")
+    if len(password) < 4:
+        print("\n[!] Password terlalu pendek! Minimal 4 karakter.")
+        time.sleep(1.5)
+        return False
+
+    user_baru = {
+        "username": username,
+        "password": password,
+        "role": "user",
+        "saldo": 0
+    }
+    users.append(user_baru)
+    if save_json(FILE_USERS, users):
+        print("\n[✓] Registrasi Berhasil! Silakan Login.")
+    else:
+        print("\n[!] Gagal menyimpan data user baru.")
+    time.sleep(1.5)
+    return True
+
+def login_user():
+    users = load_json(FILE_USERS)
+    percobaan = 0
+    
+    while percobaan < 3:
+        clear_screen()
+        print("----------------------------------------")
+        print("             LOGIN SISTEM               ")
+        print("----------------------------------------")
+        username = input("Username: ")
+        password = pwinput.pwinput("Password: ")
+        
+        for user in users:
+            if user['username'] == username and user['password'] == password:
+                print(f"\n[✓] Login Berhasil! Selamat datang, {username}.")
+                time.sleep(1)
+                return user
+        
+        percobaan += 1
+        sisa = 3 - percobaan
+        if sisa > 0:
+            print(f"\n[!] Username atau Password salah! Sisa percobaan: {sisa}")
+            time.sleep(1.5)
+    
+    print("\n[!] Anda telah salah memasukkan akun 3 kali. Akses terkunci sementara.")
+    time.sleep(2)
+    return None
