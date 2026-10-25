@@ -71,7 +71,7 @@ SistemRentalKamera/
 | Role | Username | Password | Saldo Awal | Keterangan |
 | :--- | :--- | :--- | :--- | :--- |
 | **Admin** | `admin` | `admin123` | - | Akses penuh CRUD kamera & Laporan Transaksi |
-| **User** | `user1` | `user1234` | - Akses sewa, pengembalian, top up & invoice |
+| **User** | `user1` | `user1234` | - | Akses sewa, pengembalian, top up & invoice |
 
 ---
 
