@@ -11,10 +11,10 @@ Aplikasi manajemen rental kamera berbasis *Command Line Interface* (CLI) yang di
 
 | Nama Anggota | NIM | Username GitHub | Role & Modul Tanggung Jawab |
 | :--- | :--- | :--- | :--- |
-| **M. Fairuz Firerza Aliushami** | 2609116062 | `@itsraizhu` | **Main Program & System Navigation** (`main.py`, `utils.py`) |
-| **Muhammad Fachri Razabi** | 2609116069 | `@Fachri2207` | **Admin & CRUD Inventory Lead** (`kamera.py`, `kamera.json`) |
-| **Raisha Achdi Febiandika** | 2609116071 | `@FEBIANDIKA1107` | **Transaction & Billing Lead** (`transaksi.py`, `transaksi.json`, `invoices/`) |
-| **Alya Shofa** | 2609116077 | `@alyashofaaa15-cloud` | **Authentication & Documentation Lead** (`auth.py`, `users.json`, Laporan) |
+| **M. Fairuz Firerza Aliushami** | 2609116062 | `@itsraizhu` | (`main.py`, `utils.py`) |
+| **Muhammad Fachri Razabi** | 2609116069 | `@Fachri2207` | (`kamera.py`, `kamera.json`) |
+| **Raisha Achdi Febiandika** | 2609116071 | `@FEBIANDIKA1107` | (`transaksi.py`, `transaksi.json`, `invoices/`) |
+| **Alya Shofa** | 2609116077 | `@alyashofaaa15-cloud` | (`auth.py`, `users.json`, Laporan) |
 
 ---
 
