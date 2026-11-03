@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 from prettytable import PrettyTable
-from utils import clear_screen, load_json, save_json
+from utils import clear_screen, load_json, save_json, input_aman as input
 from kamera import tampilkan_kamera
 
 FILE_TRANSAKSI = 'data/transaksi.json'
@@ -16,6 +16,22 @@ def perbarui_saldo_user(username, saldo_baru):
             u['saldo'] = saldo_baru
             break
     save_json(FILE_USERS, users)
+
+def buat_id_transaksi(transaksi_list):
+    nomor_maks = 0
+    for t in transaksi_list:
+        tid = t.get('id_transaksi', '')
+        if tid.startswith('TRX'):
+            suffix = tid[3:]
+            if suffix.isdigit() and len(suffix) <= 4:
+                nomor_maks = max(nomor_maks, int(suffix))
+    
+    if nomor_maks > 0:
+        nomor_baru = nomor_maks + 1
+    else:
+        nomor_baru = len(transaksi_list) + 1
+        
+    return f"TRX{nomor_baru:03d}"
 
 def simpan_invoice_txt(trx):
     try:
@@ -72,11 +88,14 @@ def cetak_invoice(trx):
     print("   Simpan struk ini sebagai bukti sewa    ")
     print("------------------------------------------")
     
-    simpan = input("\nSimpan / Ekspor invoice ke file .txt? (y/n): ").strip().lower()
-    if simpan == 'y':
-        path = simpan_invoice_txt(trx)
-        if path:
-            print(f"[✓] Invoice berhasil disimpan di: {path}")
+    try:
+        simpan = input("\nSimpan / Ekspor invoice ke file .txt? (y/n): ").strip().lower()
+        if simpan == 'y':
+            path = simpan_invoice_txt(trx)
+            if path:
+                print(f"[✓] Invoice berhasil disimpan di: {path}")
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
 
 def top_up_saldo(user_aktif):
     clear_screen()
@@ -104,6 +123,9 @@ def top_up_saldo(user_aktif):
             print("\n[-] Top Up dibatalkan.")
     except ValueError:
         print("\n[!] Input nominal harus berupa angka!")
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Top Up dibatalkan.")
         
     time.sleep(1.5)
 
@@ -119,24 +141,24 @@ def sewa_kamera(user_aktif):
         time.sleep(1.5)
         return
         
-    id_kamera = input("\nMasukkan ID Alat yang ingin disewa: ").strip().upper()
-    kamera_terpilih = None
-    for k in kamera_list:
-        if k['id'] == id_kamera:
-            kamera_terpilih = k
-            break
-            
-    if not kamera_terpilih:
-        print("\n[!] ID Alat tidak ditemukan!")
-        time.sleep(1.5)
-        return
-        
-    if kamera_terpilih['stok'] <= 0:
-        print("\n[!] Maaf, stok alat ini sedang habis!")
-        time.sleep(1.5)
-        return
-        
     try:
+        id_kamera = input("\nMasukkan ID Alat yang ingin disewa: ").strip().upper()
+        kamera_terpilih = None
+        for k in kamera_list:
+            if k['id'] == id_kamera:
+                kamera_terpilih = k
+                break
+                
+        if not kamera_terpilih:
+            print("\n[!] ID Alat tidak ditemukan!")
+            time.sleep(1.5)
+            return
+            
+        if kamera_terpilih['stok'] <= 0:
+            print("\n[!] Maaf, stok alat ini sedang habis!")
+            time.sleep(1.5)
+            return
+            
         lama_hari = int(input("Masukkan lama sewa (dalam hari): ").strip())
         if lama_hari <= 0:
             print("\n[!] Durasi sewa minimal 1 hari!")
@@ -178,7 +200,7 @@ def sewa_kamera(user_aktif):
         save_json(FILE_KAMERA, kamera_list)
         
         transaksi_list = load_json(FILE_TRANSAKSI)
-        id_transaksi = f"TRX{int(time.time())}"
+        id_transaksi = buat_id_transaksi(transaksi_list)
         waktu_sekarang = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         transaksi_baru = {
@@ -204,6 +226,10 @@ def sewa_kamera(user_aktif):
     except ValueError:
         print("\n[!] Input durasi sewa harus berupa angka!")
         time.sleep(1.5)
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Penyewaan alat dibatalkan.")
+        time.sleep(1.5)
 
 def pengembalian_kamera(user_aktif):
     clear_screen()
@@ -217,7 +243,10 @@ def pengembalian_kamera(user_aktif):
     
     if not sewa_aktif:
         print("\n[i] Anda tidak memiliki alat yang sedang disewa.")
-        input("\nTekan Enter untuk kembali...")
+        try:
+            input("\nTekan Enter untuk kembali...")
+        except EOFError:
+            pass
         return
         
     tabel = PrettyTable()
@@ -226,35 +255,40 @@ def pengembalian_kamera(user_aktif):
         tabel.add_row([t['id_transaksi'], t['nama_kamera'], t['tanggal_sewa'], f"{t['lama_hari']} Hari", f"Rp {t['total_biaya']:,}"])
     print(tabel)
     
-    id_trx = input("\nMasukkan ID Transaksi yang ingin dikembalikan: ").strip()
-    trx_ditemukan = None
-    for t in sewa_aktif:
-        if t['id_transaksi'] == id_trx:
-            trx_ditemukan = t
-            break
-            
-    if not trx_ditemukan:
-        print("\n[!] ID Transaksi tidak valid atau tidak ditemukan dalam sewa aktif!")
-        time.sleep(1.5)
-        return
-        
-    konfirm = input(f"Konfirmasi pengembalian '{trx_ditemukan['nama_kamera']}'? (y/n): ").strip().lower()
-    if konfirm == 'y':
-        trx_ditemukan['status'] = "Selesai"
-        trx_ditemukan['tanggal_kembali'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        save_json(FILE_TRANSAKSI, transaksi_list)
-        
-        for k in kamera_list:
-            if k['id'] == trx_ditemukan['id_kamera']:
-                k['stok'] += 1
+    try:
+        id_trx = input("\nMasukkan ID Transaksi yang ingin dikembalikan: ").strip()
+        trx_ditemukan = None
+        for t in sewa_aktif:
+            if t['id_transaksi'] == id_trx:
+                trx_ditemukan = t
                 break
-        save_json(FILE_KAMERA, kamera_list)
-        
-        print("\n[✓] Alat berhasil dikembalikan! Terima kasih.")
-    else:
-        print("\n[-] Pengembalian dibatalkan.")
-        
-    time.sleep(1.5)
+                
+        if not trx_ditemukan:
+            print("\n[!] ID Transaksi tidak valid atau tidak ditemukan dalam sewa aktif!")
+            time.sleep(1.5)
+            return
+            
+        konfirm = input(f"Konfirmasi pengembalian '{trx_ditemukan['nama_kamera']}'? (y/n): ").strip().lower()
+        if konfirm == 'y':
+            trx_ditemukan['status'] = "Selesai"
+            trx_ditemukan['tanggal_kembali'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            save_json(FILE_TRANSAKSI, transaksi_list)
+            
+            for k in kamera_list:
+                if k['id'] == trx_ditemukan['id_kamera']:
+                    k['stok'] += 1
+                    break
+            save_json(FILE_KAMERA, kamera_list)
+            
+            print("\n[✓] Alat berhasil dikembalikan! Terima kasih.")
+        else:
+            print("\n[-] Pengembalian dibatalkan.")
+            
+        time.sleep(1.5)
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Pengembalian dibatalkan.")
+        time.sleep(1.5)
 
 def riwayat_user(user_aktif):
     clear_screen()
@@ -266,7 +300,10 @@ def riwayat_user(user_aktif):
     
     if not user_trx:
         print("\n[i] Anda belum memiliki riwayat transaksi.")
-        input("\nTekan Enter untuk kembali...")
+        try:
+            input("\nTekan Enter untuk kembali...")
+        except EOFError:
+            pass
         return
         
     tabel = PrettyTable()
@@ -275,19 +312,23 @@ def riwayat_user(user_aktif):
         tabel.add_row([t['id_transaksi'], t['nama_kamera'], f"{t['lama_hari']} Hari", f"Rp {t['total_biaya']:,}", t['status']])
     print(tabel)
     
-    pilihan = input("\nMasukkan ID Transaksi untuk cetak Invoice (Enter untuk kembali): ").strip()
-    if pilihan:
-        trx_pilih = None
-        for t in user_trx:
-            if t['id_transaksi'] == pilihan:
-                trx_pilih = t
-                break
-        if trx_pilih:
-            cetak_invoice(trx_pilih)
-            input("\nTekan Enter untuk kembali...")
-        else:
-            print("\n[!] ID Transaksi tidak ditemukan!")
-            time.sleep(1.5)
+    try:
+        pilihan = input("\nMasukkan ID Transaksi untuk cetak Invoice (Enter untuk kembali): ").strip()
+        if pilihan:
+            trx_pilih = None
+            for t in user_trx:
+                if t['id_transaksi'] == pilihan:
+                    trx_pilih = t
+                    break
+            if trx_pilih:
+                cetak_invoice(trx_pilih)
+                input("\nTekan Enter untuk kembali...")
+            else:
+                print("\n[!] ID Transaksi tidak ditemukan!")
+                time.sleep(1.5)
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        time.sleep(1.5)
 
 def riwayat_admin():
     clear_screen()
@@ -298,7 +339,10 @@ def riwayat_admin():
     
     if not transaksi_list:
         print("\n[i] Belum ada transaksi yang tercatat.")
-        input("\nTekan Enter untuk kembali...")
+        try:
+            input("\nTekan Enter untuk kembali...")
+        except EOFError:
+            pass
         return
         
     tabel = PrettyTable()
@@ -307,16 +351,20 @@ def riwayat_admin():
         tabel.add_row([t['id_transaksi'], t['username'], t['nama_kamera'], f"{t['lama_hari']} Hari", f"Rp {t['total_biaya']:,}", t['status']])
     print(tabel)
     
-    pilihan = input("\nMasukkan ID Transaksi untuk cetak Invoice (Enter untuk kembali): ").strip()
-    if pilihan:
-        trx_pilih = None
-        for t in transaksi_list:
-            if t['id_transaksi'] == pilihan:
-                trx_pilih = t
-                break
-        if trx_pilih:
-            cetak_invoice(trx_pilih)
-            input("\nTekan Enter untuk kembali...")
-        else:
-            print("\n[!] ID Transaksi tidak ditemukan!")
-            time.sleep(1.5)
+    try:
+        pilihan = input("\nMasukkan ID Transaksi untuk cetak Invoice (Enter untuk kembali): ").strip()
+        if pilihan:
+            trx_pilih = None
+            for t in transaksi_list:
+                if t['id_transaksi'] == pilihan:
+                    trx_pilih = t
+                    break
+            if trx_pilih:
+                cetak_invoice(trx_pilih)
+                input("\nTekan Enter untuk kembali...")
+            else:
+                print("\n[!] ID Transaksi tidak ditemukan!")
+                time.sleep(1.5)
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        time.sleep(1.5)
