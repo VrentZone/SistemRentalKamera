@@ -71,9 +71,8 @@ SistemRentalKamera/
 | Role | Username | Password | Saldo Awal | Keterangan |
 | :--- | :--- | :--- | :--- | :--- |
 | **Admin** | `admin` | `admin123` | - | Akses penuh CRUD kamera & Laporan Transaksi |
-| **User** | `user1` | `user1234` | - | Akses sewa, pengembalian, top up & invoice |
+| **User** | `user1` | `user1234` | - Akses sewa, pengembalian, top up & invoice |
 
 ---
-
 ## 📜 Lisensi & Keterangan
 Proyek ini dibuat untuk memenuhi tugas **Project Akhir (PA) Praktikum Dasar-Dasar Pemrograman Python 2026**.
