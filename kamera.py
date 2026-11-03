@@ -1,6 +1,6 @@
 import time
 from prettytable import PrettyTable
-from utils import clear_screen, load_json, save_json
+from utils import clear_screen, load_json, save_json, input_aman as input
 
 FILE_KAMERA = 'data/kamera.json'
 FILE_TRANSAKSI = 'data/transaksi.json'
@@ -71,6 +71,9 @@ def tambah_kamera():
             print("\n[!] Gagal menyimpan data kamera baru.")
     except ValueError:
         print("\n[!] Error: Input harga sewa dan stok harus berupa angka!")
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Penambahan kamera dibatalkan.")
     
     time.sleep(1.5)
 
@@ -86,28 +89,28 @@ def ubah_kamera():
         time.sleep(1.5)
         return
 
-    id_target = input("\nMasukkan ID Alat yang ingin diubah: ").strip().upper()
-    index_found = -1
-    for i, k in enumerate(kamera_list):
-        if k['id'] == id_target:
-            index_found = i
-            break
-
-    if index_found == -1:
-        print("\n[!] ID Alat tidak ditemukan!")
-        time.sleep(1.5)
-        return
-
-    item = kamera_list[index_found]
-    print(f"\n[Mengubah Data untuk: {item['nama']}]")
-    print("(Tekan Enter jika tidak ingin mengubah nilai tertentu)")
-    
-    nama_baru = input(f"Nama Baru [{item['nama']}]: ").strip()
-    kategori_baru = input(f"Kategori Baru [{item['kategori']}]: ").strip()
-    harga_str = input(f"Harga Sewa Baru [{item['harga_sewa']}]: ").strip()
-    stok_str = input(f"Stok Baru [{item['stok']}]: ").strip()
-
     try:
+        id_target = input("\nMasukkan ID Alat yang ingin diubah: ").strip().upper()
+        index_found = -1
+        for i, k in enumerate(kamera_list):
+            if k['id'] == id_target:
+                index_found = i
+                break
+
+        if index_found == -1:
+            print("\n[!] ID Alat tidak ditemukan!")
+            time.sleep(1.5)
+            return
+
+        item = kamera_list[index_found]
+        print(f"\n[Mengubah Data untuk: {item['nama']}]")
+        print("(Tekan Enter jika tidak ingin mengubah nilai tertentu)")
+        
+        nama_baru = input(f"Nama Baru [{item['nama']}]: ").strip()
+        kategori_baru = input(f"Kategori Baru [{item['kategori']}]: ").strip()
+        harga_str = input(f"Harga Sewa Baru [{item['harga_sewa']}]: ").strip()
+        stok_str = input(f"Stok Baru [{item['stok']}]: ").strip()
+
         if nama_baru:
             item['nama'] = nama_baru
         if kategori_baru:
@@ -134,6 +137,9 @@ def ubah_kamera():
             print("\n[!] Gagal memperbarui data.")
     except ValueError:
         print("\n[!] Error: Harga sewa dan stok harus berupa angka!")
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Pengubahan kamera dibatalkan.")
     
     time.sleep(1.5)
 
@@ -149,32 +155,36 @@ def hapus_kamera():
         time.sleep(1.5)
         return
 
-    id_target = input("\nMasukkan ID Alat yang ingin dihapus: ").strip().upper()
-    index_found = -1
-    for i, k in enumerate(kamera_list):
-        if k['id'] == id_target:
-            index_found = i
-            break
+    try:
+        id_target = input("\nMasukkan ID Alat yang ingin dihapus: ").strip().upper()
+        index_found = -1
+        for i, k in enumerate(kamera_list):
+            if k['id'] == id_target:
+                index_found = i
+                break
 
-    if index_found != -1:
-        item = kamera_list[index_found]
-        transaksi_list = load_json(FILE_TRANSAKSI)
-        sedang_disewa = any(t['id_kamera'] == id_target and t['status'] == "Disewa" for t in transaksi_list)
-        if sedang_disewa:
-            print(f"\n[!] Peringatan: Alat '{item['nama']}' sedang disewa oleh user!")
-            print("[!] Hapus dibatalkan. Tunggu hingga alat selesai dikembalikan.")
-            time.sleep(2)
-            return
+        if index_found != -1:
+            item = kamera_list[index_found]
+            transaksi_list = load_json(FILE_TRANSAKSI)
+            sedang_disewa = any(t['id_kamera'] == id_target and t['status'] == "Disewa" for t in transaksi_list)
+            if sedang_disewa:
+                print(f"\n[!] Peringatan: Alat '{item['nama']}' sedang disewa oleh user!")
+                print("[!] Hapus dibatalkan. Tunggu hingga alat selesai dikembalikan.")
+                time.sleep(2)
+                return
 
-        konfirm = input(f"Apakah Anda yakin ingin menghapus '{item['nama']}'? (y/n): ").strip().lower()
-        if konfirm == 'y':
-            del kamera_list[index_found]
-            if save_json(FILE_KAMERA, kamera_list):
-                print("\n[✓] Data kamera berhasil dihapus.")
+            konfirm = input(f"Apakah Anda yakin ingin menghapus '{item['nama']}'? (y/n): ").strip().lower()
+            if konfirm == 'y':
+                del kamera_list[index_found]
+                if save_json(FILE_KAMERA, kamera_list):
+                    print("\n[✓] Data kamera berhasil dihapus.")
+                else:
+                    print("\n[!] Gagal menghapus data.")
             else:
-                print("\n[!] Gagal menghapus data.")
+                print("\n[-] Penghapusan dibatalkan.")
         else:
-            print("\n[-] Penghapusan dibatalkan.")
-    else:
-        print("\n[!] ID Alat tidak ditemukan!")
+            print("\n[!] ID Alat tidak ditemukan!")
+    except EOFError:
+        print("\n\n[!] EOFError: Terjadi ketika user menekan CTRL+Z pada menu input.")
+        print("[i] Penghapusan kamera dibatalkan.")
     time.sleep(1.5)
