@@ -80,106 +80,19 @@ Aplikasi dibangun dengan prinsip arsitektur modular (*Separation of Concerns*), 
 Dokumen alur sistem divisualisasikan menggunakan diagram alir standar Mermaid yang dirender secara otomatis pada GitHub:
 
 ### A. Flowchart Alur Program Utama
-```mermaid
-flowchart TD
-    Start([Mulai Aplikasi: python main.py]) --> Clear1[Clear Screen]
-    Clear1 --> MainMenu[/Tampilkan Menu Utama/]
-    MainMenu --> Choice{Pilihan Pengguna}
 
-    Choice -- "1" --> LoginFlow[Proses Login Akun]
-    Choice -- "2" --> RegFlow[Proses Registrasi Akun]
-    Choice -- "3" --> ExitApp([Keluar Aplikasi / Terminasi])
-    Choice -- Lainnya --> InvalidOpt[Peringatan Pilihan Tidak Valid] --> MainMenu
-
-    RegFlow --> MainMenu
-
-    LoginFlow --> AuthSuccess{Kredensial Valid?}
-    AuthSuccess -- Tidak --> MainMenu
-    AuthSuccess -- Ya --> RoleCheck{Cek Role Pengguna}
-
-    RoleCheck -- "admin" --> AdminPanel[Dashboard Menu Admin]
-    RoleCheck -- "user" --> UserPanel[Dashboard Menu User]
-
-    AdminPanel -- Logout --> MainMenu
-    UserPanel -- Logout --> MainMenu
-```
+![Flowchart Menu Utama](flowcharts/flowchart_main.png)
 
 ---
 
 ### B. Flowchart Dashboard Administrator
-```mermaid
-flowchart TD
-    AdminStart([Menu Administrator]) --> AdminMenu[/Tampilkan 6 Opsi Menu Admin/]
-    AdminMenu --> AdminChoice{Pilih Menu}
-
-    AdminChoice -- "1" --> ReadCam[Tampilkan Tabel Kamera via PrettyTable] --> BackAdmin[Kembali ke Menu Admin]
-    
-    AdminChoice -- "2" --> InputNewCam[/Input ID, Nama, Kategori, Harga, Stok/]
-    InputNewCam --> ValNewCam{ID Unik & Harga > 0 & Stok >= 0?}
-    ValNewCam -- Ya --> SaveCam[Simpan ke data/kamera.json] --> BackAdmin
-    ValNewCam -- Tidak --> ErrNewCam[/Tampilkan Kesalahan Validasi/] --> BackAdmin
-
-    AdminChoice -- "3" --> SelectUpdate[/Pilih ID Alat yang Ingin Diubah/]
-    SelectUpdate --> InputEdit[/Input Data Baru / Enter untuk Tetap/]
-    InputEdit --> SaveEdit[Perbarui data/kamera.json] --> BackAdmin
-
-    AdminChoice -- "4" --> SelectDel[/Pilih ID Alat yang Ingin Dihapus/]
-    SelectDel --> CheckRented{Apakah Alat Sedang 'Disewa' di transaksi.json?}
-    CheckRented -- Ya --> RejectDel[/TOLAK: Alat Sedang Aktif Disewa!/] --> BackAdmin
-    CheckRented -- Tidak --> ConfirmDel{Konfirmasi Hapus? y/n}
-    ConfirmDel -- Ya --> DeleteCam[Hapus dari data/kamera.json] --> BackAdmin
-    ConfirmDel -- Tidak --> CancelDel[/Hapus Dibatalkan/] --> BackAdmin
-
-    AdminChoice -- "5" --> ViewTrxReport[Tampilkan Semua Riwayat Transaksi]
-    ViewTrxReport --> ExportOpt{Cetak / Ekspor Struk ID? Enter / ID}
-    ExportOpt -- ID Diberikan --> GenerateAdminInv[Cetak & Ekspor ke invoices/ .txt] --> BackAdmin
-    ExportOpt -- Enter --> BackAdmin
-
-    AdminChoice -- "6" --> LogoutAdmin([Logout & Kembali ke Menu Utama])
-```
+![Flowchart Menu admin](flowcharts/flowchart_admin.png)
 
 ---
 
 ### C. Flowchart Dashboard User 
-```mermaid
-flowchart TD
-    UserStart([Menu Pelanggan / User]) --> SyncSaldo[Sinkronisasi Saldo Real-Time dari users.json]
-    SyncSaldo --> UserMenu[/Tampilkan 6 Opsi Menu User/]
-    UserMenu --> UserChoice{Pilih Menu}
 
-    UserChoice -- "1" --> ShowCatalog[Lihat Katalog Kamera & Stok] --> BackUser[Kembali ke Menu User]
-
-    UserChoice -- "2" --> RentStart[/Pilih ID Kamera & Masukkan Durasi Sewa/]
-    RentStart --> ValStock{Stok Alat > 0?}
-    ValStock -- Tidak --> OutOfStock[/Tolak: Stok Habis/] --> BackUser
-    ValStock -- Ya --> CalcCost[Hitung: Total Biaya = Durasi * Harga]
-    CalcCost --> ValSaldo{Saldo >= Total Biaya?}
-    ValSaldo -- Tidak --> SaldoKurang[/Tolak: Saldo E-Money Kurang, Arahkan Top Up/] --> BackUser
-    ValSaldo -- Ya --> ConfirmPay{Konfirmasi Pembayaran? y/n}
-    ConfirmPay -- Ya --> ExecRent[Potong Saldo, Kurangi Stok -1, Buat TRX Baru: 'Disewa']
-    ExecRent --> ShowInv[/Tampilkan Invoice & Opsi Ekspor ke file .txt/] --> BackUser
-    ConfirmPay -- Tidak --> RentCancel[/Sewa Dibatalkan/] --> BackUser
-
-    UserChoice -- "3" --> RetStart[Filter Transaksi User Berstatus 'Disewa']
-    RetStart --> CheckActive{Ada Barang Disewa?}
-    CheckActive -- Tidak --> NoActive[/Info: Tidak ada sewa aktif/] --> BackUser
-    CheckActive -- Ya --> SelectRet[/Pilih ID Transaksi/]
-    SelectRet --> ConfirmRet{Konfirmasi Pengembalian? y/n}
-    ConfirmRet -- Ya --> ExecRet[Ubah Status: 'Selesai', Catat Waktu, Restok Kamera +1] --> BackUser
-    ConfirmRet -- Tidak --> RetCancel[/Pengembalian Dibatalkan/] --> BackUser
-
-    UserChoice -- "4" --> TopupStart[/Input Nominal Top Up/]
-    TopupStart --> ValTopup{Nominal >= Rp 10.000?}
-    ValTopup -- Ya --> AddSaldo[Tambah Saldo ke users.json] --> BackUser
-    ValTopup -- Tidak --> TopupMinErr[/Tolak: Minimal Top Up Rp 10.000/] --> BackUser
-
-    UserChoice -- "5" --> UserTrxList[Tampilkan Riwayat Transaksi Pribadi]
-    UserTrxList --> PrintOpt{Cetak Ulang Struk? Masukkan ID / Enter}
-    PrintOpt -- Masukkan ID --> PrintInvUser[Cetak Struk & Ekspor .txt] --> BackUser
-    PrintOpt -- Enter --> BackUser
-
-    UserChoice -- "6" --> LogoutUser([Logout & Kembali ke Menu Utama])
-```
+![Flowchart Menu Utama](flowcharts/flowchart_user.png)
 
 ---
 
