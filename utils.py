@@ -7,6 +7,12 @@ def clear_screen():
     else:
         os.system('clear')
 
+def input_aman(prompt=""):
+    teks = input(prompt)
+    if '\x1a' in teks or teks.strip() == '^Z':
+        raise EOFError("Terjadi ketika user menekan CTRL+Z pada menu input.")
+    return teks
+
 def load_json(nama_file):
     try:
         if not os.path.exists(nama_file):
