@@ -4,20 +4,48 @@
         "nama": "Sony Alpha A7 III",
         "kategori": "Kamera Mirrorless",
         "harga_sewa": 250000,
-        "stok": 5
-    },
-    {
-        "id": "CAM02",
-        "nama": "Cannon EOS 80D",
-        "kategori": "Kamera DSLR",
-        "harga_sewa": 180000,
         "stok": 3
     },
     {
+        "id": "CAM02",
+        "nama": "Canon EOS 80D",
+        "kategori": "Kamera DSLR",
+        "harga_sewa": 180000,
+        "stok": 5
+    },
+    {
         "id": "CAM03",
-        "nama": "Fujufilm X-T4 Body",
+        "nama": "Fujifilm X-T4 Body Only",
         "kategori": "Kamera Mirrorless",
         "harga_sewa": 220000,
         "stok": 2
+    },
+    {
+        "id": "LNS01",
+        "nama": "Lensa Sony FE 50mm f/1.8",
+        "kategori": "Lensa",
+        "harga_sewa": 75000,
+        "stok": 4
+    },
+    {
+        "id": "LGT01",
+        "nama": "Godox SL60W LED Light",
+        "kategori": "Aksesoris/Lighting",
+        "harga_sewa": 60000,
+        "stok": 3
+    },
+    {
+        "id": "STB01",
+        "nama": "DJI RS 2 Gimbal Stabilizer",
+        "kategori": "Stabilizer",
+        "harga_sewa": 150000,
+        "stok": 2
+    },
+    {
+        "id": "CAM04",
+        "nama": "Canon",
+        "kategori": "DSLR",
+        "harga_sewa": 300000,
+        "stok": 7
     }
 ]
