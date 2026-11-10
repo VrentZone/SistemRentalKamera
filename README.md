@@ -172,7 +172,7 @@ SistemRentalKamera/
 │   └── users.json                   # Database kredensial pengguna, role, & saldo
 │
 ├── invoices/                        # Direktori penyimpanan ekspor struk pembayaran (.txt)
-│   └── invoice_DUMMY.txt    # Contoh struk transaksi sewa fisik
+│   └── invoice_DUMMY.txt            # Contoh struk transaksi sewa fisik
 │
 ├── auth.py                          # Modul autentikasi: registrasi, login, lockout
 ├── kamera.py                        # Modul pengelolaan inventaris kamera (CRUD Admin)
