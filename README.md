@@ -172,15 +172,13 @@ SistemRentalKamera/
 │   └── users.json                   # Database kredensial pengguna, role, & saldo
 │
 ├── invoices/                        # Direktori penyimpanan ekspor struk pembayaran (.txt)
-│   ├── invoice_TRX1792924134.txt    # Contoh struk transaksi sewa fisik
-│   └── invoice_TRX1792990189.txt
+│   └── invoice_DUMMY.txt    # Contoh struk transaksi sewa fisik
 │
 ├── auth.py                          # Modul autentikasi: registrasi, login, lockout
 ├── kamera.py                        # Modul pengelolaan inventaris kamera (CRUD Admin)
 ├── main.py                          # File utama (entry point) dan navigasi menu sistem
 ├── transaksi.py                     # Modul bisnis sewa, pengembalian, top up, & invoice
 ├── utils.py                         # Modul utilitas: I/O JSON, clear screen, input aman
-├── ALUR_SISTEM.md                   # Dokumentasi alur logika dan teknis sistem lengkap
 └── README.md                        # Dokumentasi utama proyek
 ```
 
