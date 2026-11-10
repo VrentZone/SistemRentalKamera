@@ -3,21 +3,21 @@
         "id": "CAM01",
         "nama": "Sony Alpha A7 III",
         "kategori": "Kamera Mirrorless",
-        "harga": 250000,
-        "jumlah": 5
+        "harga_sewa": 250000,
+        "stok": 5
     },
     {
         "id": "CAM02",
         "nama": "Cannon EOS 80D",
         "kategori": "Kamera DSLR",
-        "harga": 180000,
-        "jumlah": 3
+        "harga_sewa": 180000,
+        "stok": 3
     },
     {
         "id": "CAM03",
         "nama": "Fujufilm X-T4 Body",
         "kategori": "Kamera Mirrorless",
-        "harga": 220000,
-        "jumlah": 2
+        "harga_sewa": 220000,
+        "stok": 2
     }
 ]
