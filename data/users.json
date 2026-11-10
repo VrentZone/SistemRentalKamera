@@ -9,12 +9,12 @@
         "username": "user1",
         "password": "user1234",
         "role": "user",
-        "saldo": 500000
+        "saldo": 100000
     },
     {
-        "username": "Reja",
-        "password": "reja123",
+        "username": "user",
+        "password": "user123",
         "role": "user",
-        "saldo": 0
+        "saldo": 250000
     }
 ]
